@@ -1,75 +1,62 @@
-document.getElementById('date').innerHTML=Date();
-const options = {
-    method: 'GET',
-    headers: {
-        'X-RapidAPI-Key': '6d4c702e3amsh4ac7e191e51c090p1954c0jsnb0fec7c5a1f7',
-        'X-RapidAPI-Host': 'weather-by-api-ninjas.p.rapidapi.com'
-    }
-};
+document.getElementById('date').innerHTML = Date();
+const apiKey = 'aa454c8816fddea166c0736bb42f67af';
+
 let a;
-function printvalue(a){
-   
-    if (a>95 && a<=100 ) {
-        
-        document.getElementById("myImg").src = "img/rain95-100.png"; 
+
+function printvalue(a) {
+    if (a > 95 && a <= 100) {
+        document.getElementById("myImg").src = "img/rain95-100.png";
+        // alert to user
+        alert("Rainfall is high");
         Cloud.innerHTML = "Heavy Rain";
-    } else if (a>85 && a<=95 ) {
-        
+    } else if (a > 85 && a <= 95) {
         document.getElementById("myImg").src = "img/rain85-95.png";
-        Cloud.innerHTML = "Mostly Rain"
-    } else if (a>70 && a<=85 ) {
-        
+        // alert to user
+        alert("Rainfall is moderate");
+        Cloud.innerHTML = "Mostly Rain";
+    } else if (a > 70 && a <= 85) {
         document.getElementById("myImg").src = "img/rain70-85.png";
-        Cloud.innerHTML = "Rain"
-    } else if (a>50 && a<=70 ) {
-        
+        Cloud.innerHTML = "Rain";
+    } else if (a > 50 && a <= 70) {
         document.getElementById("myImg").src = "img/rain50-70.png";
-        Cloud.innerHTML = "Slow Rain"
-    } else if (a>30 && a<=50 ) {
-        
+        Cloud.innerHTML = "Slow Rain";
+    } else if (a > 30 && a <= 50) {
         document.getElementById("myImg").src = "img/rain30-50.png";
-        Cloud.innerHTML = "Mostly Cloud"
-    } else if (a>15 && a<=30 ) {
-        
+        Cloud.innerHTML = "Mostly Cloud";
+    } else if (a > 15 && a <= 30) {
         document.getElementById("myImg").src = "img/rain15-30.png";
-        Cloud.innerHTML = "Cloud"
-    } else if (a>5 && a<=15 ) {
-        
+        Cloud.innerHTML = "Cloud";
+    } else if (a > 5 && a <= 15) {
         document.getElementById("myImg").src = "img/rain5-15.png";
-        Cloud.innerHTML = "Mostly Sunny"
+        Cloud.innerHTML = "Mostly Sunny";
     } else {
-        
         document.getElementById("myImg").src = "img/rain0-5.png";
-        Cloud.innerHTML = "Sunny"
-        
-    } 
-
-}
-const weatherGet = (city1)=>{
-    
-    cityName.innerHTML = city1
-    fetch('https://weather-by-api-ninjas.p.rapidapi.com/v1/weather?city=' + city1, options)
-    .then(response => response.json())
-    .then(response => {
-        const cl = response.cloud_pct;
-         printvalue(cl)
-        cloud_pct.innerHTML = response.cloud_pct
-        temp.innerHTML = response.temp
-        feels_like.innerHTML = response.feels_like
-        humidity.innerHTML = response.humidity
-        min_temp.innerHTML = response.min_temp
-        max_temp.innerHTML = response.max_temp
-        wind_speed.innerHTML = response.wind_speed
-        // wind_degrees.innerHTML = response.wind_degrees
-        // convert time to timestamp
-        sunrise.innerHTML = convertUnixTimestampToTime(response.sunrise)
-        sunset.innerHTML = convertUnixTimestampToTime(response.sunset)
-
-    })
-    .catch(err => console.error(err));  
+        Cloud.innerHTML = "Sunny";
+    }
 }
 
-// time converter // convert time to timestamp
+const weatherGet = (city1) => {
+    cityName.innerHTML = city1;
+
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city1}&appid=${apiKey}&units=metric`)
+        .then(response => response.json())
+        .then(response => {
+            const cl = response.clouds.all;
+            printvalue(cl);
+            cloud_pct.innerHTML = cl;  // Cloud percentage
+            temp.innerHTML = response.main.temp;  // Current temperature in Celsius
+            feels_like.innerHTML = response.main.feels_like;  // Feels-like temperature
+            humidity.innerHTML = response.main.humidity;  // Humidity percentage
+            min_temp.innerHTML = response.main.temp_min;  // Min temperature in Celsius
+            max_temp.innerHTML = response.main.temp_max;  // Max temperature in Celsius
+            wind_speed.innerHTML = response.wind.speed;  // Wind speed in m/s
+            sunrise.innerHTML = convertUnixTimestampToTime(response.sys.sunrise);  // Sunrise time
+            sunset.innerHTML = convertUnixTimestampToTime(response.sys.sunset);  // Sunset time
+        })
+        .catch(err => console.error(err));
+};
+
+// Time converter: convert Unix timestamp to readable time
 function convertUnixTimestampToTime(unixTimestamp) {
     const date = new Date(unixTimestamp * 1000);
     const hours = date.getHours().toString().padStart(2, '0');
@@ -77,46 +64,50 @@ function convertUnixTimestampToTime(unixTimestamp) {
     const seconds = date.getSeconds().toString().padStart(2, '0');
     return `${hours}:${minutes}:${seconds}`;
 }
-// default city 
+
+// Default city
 weatherGet("Lucknow");
-// onclick wether 
-submit.addEventListener("click" , ()=>{
-    event.preventDefault()
-    
+
+// On-click weather update
+submit.addEventListener("click", (event) => {
+    event.preventDefault();
     weatherGet(city.value);
-    //store city name in local storage//
+    
+    // Store city name in local storage
     if (localStorage.count) {
-        localStorage.count = Number(localStorage.count)+1;
-        localStorage.setItem(localStorage.count,city.value)
-        console.log(localStorage.count)
-        getWeather(localStorage.getItem(localStorage.count))
+        localStorage.count = Number(localStorage.count) + 1;
+        localStorage.setItem(localStorage.count, city.value);
+        console.log(localStorage.count);
+        getWeather(localStorage.getItem(localStorage.count));
     } else {
         localStorage.count = 1;
     }
-    ///////////////////////////////////////////////
-})
+});
 
-// for table weather data 
+// For table weather data
 const getWeather = (city) => {
-    fetch('https://weather-by-api-ninjas.p.rapidapi.com/v1/weather?city=' + city, options)
-        .then(response1 => response1.json())
-        .then(response1 => {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+        .then(response => response.json())
+        .then(response => {
+            console.log(response);
             const table = document.getElementById('weatherTable').getElementsByTagName('tbody')[0];
             const row = table.insertRow();
-            // array for table data 
+            
+            // Array for table data
             const cells = [
                 city,
-                response1.cloud_pct,
-                response1.temp,
-                response1.feels_like,
-                response1.humidity,
-                response1.min_temp,
-                response1.max_temp,
-                response1.wind_speed,
-                convertUnixTimestampToTime(response1.sunrise),
-                convertUnixTimestampToTime(response1.sunset)
+                response.clouds.all,
+                response.main.temp,
+                response.main.feels_like,
+                response.main.humidity,
+                response.main.temp_min,
+                response.main.temp_max,
+                response.wind.speed,
+                convertUnixTimestampToTime(response.sys.sunrise),
+                convertUnixTimestampToTime(response.sys.sunset)
             ];
-            // filling table by array data and city name 
+            
+            // Filling table with data
             for (let i = 0; i < cells.length; i++) {
                 const cell = row.insertCell(i);
                 cell.textContent = cells[i];
@@ -124,24 +115,21 @@ const getWeather = (city) => {
         })
         .catch(err => console.error(err));
 };
-// get weather and filling table according to city name 
-// store city names in local storage 
+
+// Populate table with stored cities
 if (localStorage.count) {
-    var counter = localStorage.count;
+    let counter = localStorage.count;
     let loopno = counter > 5 ? 5 : counter;
-    for(let i = 0; i < loopno; i++){
-        getWeather(localStorage.getItem(counter)) // returns 5 city names 
+    for (let i = 0; i < loopno; i++) {
+        getWeather(localStorage.getItem(counter));
         counter--;
     }
-   
 }
 
-// change dropdown 
+// Change dropdown
 if (localStorage.count) {
     const dropdownMenu = document.getElementById('cityDropdown');
     let counter = localStorage.count;
-
-    // Determine the loop count based on the condition
     let loopno = counter > 5 ? 5 : counter;
 
     for (let i = 0; i < loopno; i++) {
@@ -154,8 +142,3 @@ if (localStorage.count) {
         }
     }
 }
-
-
-
-
-
