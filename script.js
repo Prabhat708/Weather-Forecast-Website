@@ -6,13 +6,11 @@ let a;
 function printvalue(a) {
     if (a > 95 && a <= 100) {
         document.getElementById("myImg").src = "img/rain95-100.png";
-        // alert to user
-        alert("Rainfall is high");
+        
         Cloud.innerHTML = "Heavy Rain";
     } else if (a > 85 && a <= 95) {
         document.getElementById("myImg").src = "img/rain85-95.png";
-        // alert to user
-        alert("Rainfall is moderate");
+        
         Cloud.innerHTML = "Mostly Rain";
     } else if (a > 70 && a <= 85) {
         document.getElementById("myImg").src = "img/rain70-85.png";
